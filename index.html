@@ -6,6 +6,8 @@
   <title>KOL & KOC Multi-Platform Metrics Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Thư viện tạo file Slide PPTX / Google Slides trực tiếp trên trình duyệt -->
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
   <style>
     body { background-color: #0b0f19; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
     .table-container::-webkit-scrollbar { height: 8px; width: 8px; }
@@ -15,6 +17,7 @@
 </head>
 <body class="p-4 md:p-8 max-w-7xl mx-auto">
 
+  <!-- HEADER TRANG -->
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-gray-800 gap-4">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white text-xl shadow-lg shadow-blue-500/30">
@@ -24,23 +27,36 @@
         <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white">KOL & KOC Analytics Hub</h1>
         <p class="text-xs text-emerald-400 flex items-center gap-1.5 font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Vercel Cloud Serverless: Đang trực tuyến
+          Động cơ bóc tách: Đang trực tuyến
         </p>
       </div>
     </div>
+    
+    <!-- CÁC NÚT TÁC VỤ -->
     <div class="flex items-center gap-2 flex-wrap">
+      <!-- Nút Xuất Slide Nghiệm Thu -->
+      <button id="btnExportSlide" onclick="exportToSlides()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-file-powerpoint"></i> Xuất Slide (.pptx)
+      </button>
+
+      <!-- Nút Xuất Excel -->
       <button onclick="exportToExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
         <i class="fa-solid fa-file-excel"></i> Xuất Excel
       </button>
+
+      <!-- Nút Copy Google Sheets -->
       <button onclick="copyToSheets()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-gray-200 text-xs font-semibold rounded-lg border border-gray-700 shadow transition flex items-center gap-1.5">
         <i class="fa-solid fa-table-cells"></i> Copy Sheets
       </button>
+
+      <!-- Nút Xóa dữ liệu -->
       <button onclick="clearAllData()" class="p-2 text-gray-400 hover:text-red-400 bg-gray-900 border border-gray-800 rounded-lg transition" title="Xóa tất cả">
         <i class="fa-solid fa-trash"></i>
       </button>
     </div>
   </div>
 
+  <!-- KHU VỰC NHẬP LIỆU -->
   <div class="mt-6 bg-gray-900/90 border border-gray-800 p-5 rounded-2xl shadow-xl">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-3">
       <label class="text-sm font-semibold text-gray-300 flex items-center gap-2">
@@ -51,11 +67,11 @@
         <input type="number" id="defaultKpi" value="50000" class="w-28 px-3 py-1 bg-gray-950 border border-gray-700 rounded-lg text-sm text-emerald-400 font-semibold focus:outline-none focus:border-blue-500">
       </div>
     </div>
-    <textarea id="urlInput" rows="4" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition font-mono" placeholder="https://www.youtube.com/watch?v=r7TytTlTED4&#10;https://vt.tiktok.com/ZSVuv4brq/&#10;https://web.facebook.com/reel/2157861498105644&#10;https://www.threads.com/share/E7pXLWrQ3/"></textarea>
+    <textarea id="urlInput" rows="4" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition font-mono" placeholder="https://www.youtube.com/watch?v=r7TytTlTED4&#10;https://vt.tiktok.com/ZSVuv4brq/&#10;https://www.facebook.com/reel/2157861498105644&#10;https://www.threads.net/@saigonnghen/post/..."></textarea>
     
     <div class="mt-3 flex flex-col sm:flex-row justify-between items-center gap-3">
       <div class="text-xs text-gray-400">
-        Tự động bóc tách đa nền tảng: YouTube, TikTok, Facebook Reels, Threads.
+        Hỗ trợ bóc tách đa kênh: YouTube, TikTok, Facebook Reels, Threads.
       </div>
       <button id="btnScrape" onclick="processUrls()" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-2">
         <i class="fa-solid fa-bolt"></i> <span>Tự Động Thu Thập Dữ Liệu</span>
@@ -63,6 +79,7 @@
     </div>
   </div>
 
+  <!-- BẢNG DỮ LIỆU ĐO LƯỜNG -->
   <div class="mt-8 bg-gray-900/80 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
     <div class="p-4 border-b border-gray-800 flex justify-between items-center flex-wrap gap-2">
       <div class="flex items-center gap-2">
@@ -70,7 +87,7 @@
         <span id="recordCount" class="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded-full font-semibold">0</span>
       </div>
       <div class="text-xs text-gray-400">
-        <i class="fa-regular fa-lightbulb text-amber-400"></i> Nhấp đúp chuột vào ô số để sửa trực tiếp
+        <i class="fa-regular fa-lightbulb text-amber-400"></i> Nhấp đúp chuột vào ô số hoặc tên kênh để sửa nhanh
       </div>
     </div>
 
@@ -131,6 +148,12 @@
       return Number(num).toLocaleString('vi-VN');
     }
 
+    // Format riêng cho Slide: nếu 0 hoặc trống thì hiển thị dấu gạch ngang '-'
+    function formatSlideNum(num) {
+      if (num === null || num === undefined || isNaN(num) || num === 0) return '-';
+      return Number(num).toLocaleString('vi-VN');
+    }
+
     async function processUrls() {
       const text = document.getElementById('urlInput').value.trim();
       if (!text) return alert('Vui lòng dán ít nhất 1 link!');
@@ -180,6 +203,14 @@
     function editCell(id, field) {
       const item = trackerItems.find(x => x.id === id);
       if (!item) return;
+      if (field === 'author') {
+        const newVal = prompt('Nhập tên Hạng mục / Kênh mới:', item.author);
+        if (newVal !== null && newVal.trim() !== '') {
+          item.author = newVal.trim();
+          saveState();
+        }
+        return;
+      }
       const newVal = prompt(`Nhập giá trị mới cho ${field}:`, item[field]);
       if (newVal !== null && !isNaN(newVal)) {
         item[field] = Math.max(0, parseInt(newVal) || 0);
@@ -239,7 +270,7 @@
                 <i class="fa-brands ${pIcon}"></i> ${item.platform}
               </span>
             </td>
-            <td class="py-3 px-3 font-semibold text-gray-200 max-w-[160px] truncate" title="${item.author}">${item.author}</td>
+            <td class="py-3 px-3 font-semibold text-gray-200 max-w-[160px] truncate editable-cell" title="Nhấp đúp để đổi tên" ondblclick="editCell(${item.id}, 'author')">${item.author}</td>
             <td class="py-3 px-3">
               <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 text-xs font-mono underline decoration-blue-500/30">
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> ${shortLink}
@@ -268,13 +299,206 @@
       document.getElementById('sumEngagement').innerText = formatNumber(totalE);
     }
 
+    // =========================================================================
+    // TÍNH NĂNG TẠO VÀ XUẤT BỘ SLIDE (.PPTX / GOOGLE SLIDES)
+    // =========================================================================
+    async function exportToSlides() {
+      if (trackerItems.length === 0) return alert('Chưa có dữ liệu để xuất Slide!');
+      if (!window.PptxGenJS) return alert('Đang tải thư viện tạo slide, vui lòng bấm lại sau 3 giây!');
+
+      const btn = document.getElementById('btnExportSlide');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tạo Slide...';
+      btn.disabled = true;
+
+      try {
+        const pptx = new window.PptxGenJS();
+        // Thiết lập tỉ lệ màn hình chuẩn 16:9 Widescreen
+        pptx.defineLayout({ name: 'WIDE_16_9', width: 13.333, height: 7.5 });
+        pptx.layout = 'WIDE_16_9';
+
+        // ---------------------------------------------------------
+        // 1. TẠO CÁC SLIDE TỔNG HỢP (OVERVIEW) CÓ PHÂN TRANG TỰ ĐỘNG
+        // ---------------------------------------------------------
+        const ROWS_PER_PAGE = 7; // Tối đa 7 dòng / slide để bảng thoáng đẹp
+        const totalPages = Math.ceil(trackerItems.length / ROWS_PER_PAGE);
+
+        for (let page = 0; page < totalPages; page++) {
+          const slide = pptx.addSlide();
+          const pageItems = trackerItems.slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE);
+
+          // Tiêu đề Slide Tổng Hợp
+          slide.addText(`BÁO CÁO TỔNG HỢP CHIẾN DỊCH (Trang ${page + 1}/${totalPages})`, {
+            x: 0.6, y: 0.4, w: 12.13, h: 0.6,
+            fontSize: 20, bold: true, color: '48B14C', fontFace: 'Arial'
+          });
+
+          // Thanh kẻ ngang màu xanh lá
+          slide.addShape(pptx.shapes.LINE, {
+            x: 0.6, y: 1.05, w: 12.13, h: 0,
+            line: { color: '48B14C', width: 1.5 }
+          });
+
+          // Tiêu đề bảng
+          const tableHeader = [
+            { text: 'STT', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: 'Hạng mục', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: 'Link', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: 'Like', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: 'Comment', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: 'Share', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: 'View', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: 'Total Eng.', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: 'KPI Views', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+            { text: '% KPI', options: { bold: true, fill: 'FEF0D2', align: 'center' } }
+          ];
+
+          const tableRows = [tableHeader];
+
+          pageItems.forEach((it, idx) => {
+            const stt = page * ROWS_PER_PAGE + idx + 1;
+            const eng = (it.likes || 0) + (it.comments || 0) + (it.shares || 0);
+            const pct = it.kpiViews > 0 ? Math.round((it.views / it.kpiViews) * 100) + '%' : '-';
+
+            tableRows.push([
+              { text: String(stt), options: { align: 'center' } },
+              { text: it.author || 'KOL / KOC', options: { bold: true, align: 'left' } },
+              { text: 'Xem bài', options: { hyperlink: { url: it.url }, color: '0066CC', underline: true, align: 'center' } },
+              { text: formatSlideNum(it.likes), options: { align: 'right' } },
+              { text: formatSlideNum(it.comments), options: { align: 'right' } },
+              { text: formatSlideNum(it.shares), options: { align: 'right' } },
+              { text: formatSlideNum(it.views), options: { align: 'right', bold: true } },
+              { text: formatSlideNum(eng), options: { align: 'right' } },
+              { text: formatSlideNum(it.kpiViews), options: { align: 'right' } },
+              { text: pct, options: { align: 'center', bold: true } }
+            ]);
+          });
+
+          // Nếu là trang tổng hợp cuối cùng -> Thêm dòng TỔNG CỘNG
+          if (page === totalPages - 1) {
+            const sumLikes = trackerItems.reduce((a, b) => a + (b.likes || 0), 0);
+            const sumComments = trackerItems.reduce((a, b) => a + (b.comments || 0), 0);
+            const sumShares = trackerItems.reduce((a, b) => a + (b.shares || 0), 0);
+            const sumViews = trackerItems.reduce((a, b) => a + (b.views || 0), 0);
+            const sumKPI = trackerItems.reduce((a, b) => a + (b.kpiViews || 0), 0);
+            const sumEng = sumLikes + sumComments + sumShares;
+            const avgPct = sumKPI > 0 ? Math.round((sumViews / sumKPI) * 100) + '%' : '-';
+
+            tableRows.push([
+              { text: 'TỔNG', options: { bold: true, align: 'center', fill: 'F1F5F9' } },
+              { text: `${trackerItems.length} Bài viết`, options: { bold: true, align: 'left', fill: 'F1F5F9' } },
+              { text: '-', options: { align: 'center', fill: 'F1F5F9' } },
+              { text: formatSlideNum(sumLikes), options: { bold: true, align: 'right', fill: 'F1F5F9' } },
+              { text: formatSlideNum(sumComments), options: { bold: true, align: 'right', fill: 'F1F5F9' } },
+              { text: formatSlideNum(sumShares), options: { bold: true, align: 'right', fill: 'F1F5F9' } },
+              { text: formatSlideNum(sumViews), options: { bold: true, align: 'right', fill: 'F1F5F9' } },
+              { text: formatSlideNum(sumEng), options: { bold: true, align: 'right', fill: 'F1F5F9' } },
+              { text: formatSlideNum(sumKPI), options: { bold: true, align: 'right', fill: 'F1F5F9' } },
+              { text: avgPct, options: { bold: true, align: 'center', fill: 'F1F5F9' } }
+            ]);
+          }
+
+          slide.addTable(tableRows, {
+            x: 0.6, y: 1.35, w: 12.13,
+            colW: [0.6, 2.2, 1.0, 1.0, 1.0, 1.0, 1.3, 1.3, 1.3, 1.2],
+            fontFace: 'Arial', fontSize: 10,
+            border: { pt: 0.75, color: 'CBD5E1' },
+            margin: 0.05
+          });
+        }
+
+        // ---------------------------------------------------------
+        // 2. TẠO CÁC SLIDE CHI TIẾT CHO TỪNG BÀI VIẾT (CHUẨN MẪU)
+        // ---------------------------------------------------------
+        trackerItems.forEach((it) => {
+          const slide = pptx.addSlide();
+          const eng = (it.likes || 0) + (it.comments || 0) + (it.shares || 0);
+          const pct = it.kpiViews > 0 ? Math.round((it.views / it.kpiViews) * 100) + '%' : '-';
+          const authorUpper = (it.author || 'CHI TIẾT BÀI VIẾT').toUpperCase();
+
+          // Tên Kênh in hoa lớn, màu xanh lá cây #48B14C ở đầu slide
+          slide.addText(authorUpper, {
+            x: 0.6, y: 0.35, w: 12.13, h: 0.7,
+            fontSize: 26, bold: true, color: '48B14C', fontFace: 'Arial',
+            align: 'center', valign: 'middle'
+          });
+
+          // Thanh kẻ ngang màu xanh lá
+          slide.addShape(pptx.shapes.LINE, {
+            x: 0.6, y: 1.15, w: 12.13, h: 0,
+            line: { color: '48B14C', width: 1.5 }
+          });
+
+          // Khung viền nét đứt giữ chỗ dán ảnh
+          slide.addShape(pptx.shapes.RECTANGLE, {
+            x: 1.5, y: 1.35, w: 10.33, h: 4.4,
+            fill: { color: 'FAFAFA' },
+            line: { color: 'CBD5E1', width: 1.2, dashType: 'dash' }
+          });
+
+          slide.addText('[ BẤM CTRL + V ĐỂ DÁN ẢNH CHỤP BÀI VIẾT VÀO ĐÂY ]', {
+            x: 1.5, y: 3.2, w: 10.33, h: 0.6,
+            fontSize: 13, color: '94A3B8', fontFace: 'Arial', align: 'center', bold: true
+          });
+
+          // Bảng 9 cột đúng chuẩn mẫu ở chân slide
+          const detailTable = [
+            [
+              { text: 'Hạng mục', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+              { text: 'Link', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+              { text: 'Like', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+              { text: 'Comment', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+              { text: 'Share', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+              { text: 'View', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+              { text: 'Total\nEngagement', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+              { text: 'KPI Views', options: { bold: true, fill: 'FEF0D2', align: 'center' } },
+              { text: '%KPI Views', options: { bold: true, fill: 'FEF0D2', align: 'center' } }
+            ],
+            [
+              { text: it.author || '-', options: { bold: true, align: 'center' } },
+              { text: it.url, options: { hyperlink: { url: it.url }, color: '0066CC', underline: true, align: 'center', fontSize: 8.5 } },
+              { text: formatSlideNum(it.likes), options: { align: 'center' } },
+              { text: formatSlideNum(it.comments), options: { align: 'center' } },
+              { text: formatSlideNum(it.shares), options: { align: 'center' } },
+              { text: formatSlideNum(it.views), options: { align: 'center', bold: true } },
+              { text: formatSlideNum(eng), options: { align: 'center', bold: true } },
+              { text: formatSlideNum(it.kpiViews), options: { align: 'center' } },
+              { text: pct, options: { align: 'center', bold: true } }
+            ]
+          ];
+
+          slide.addTable(detailTable, {
+            x: 0.6, y: 5.95, w: 12.13,
+            colW: [1.8, 3.2, 0.9, 0.9, 0.8, 1.2, 1.3, 1.1, 0.9],
+            fontFace: 'Arial', fontSize: 10,
+            border: { pt: 0.75, color: 'A0AEC0' },
+            margin: 0.05
+          });
+        });
+
+        // Xuất file tải về máy
+        const fileName = `Bao_Cao_Nghiem_Thu_${new Date().toISOString().slice(0, 10)}.pptx`;
+        await pptx.writeFile({ fileName });
+
+      } catch (err) {
+        console.error(err);
+        alert('Lỗi tạo slide: ' + err.message);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // =========================================================================
+    // CÁC TÍNH NĂNG KHÁC (EXCEL & GOOGLE SHEETS)
+    // =========================================================================
     function exportToExcel() {
       if (trackerItems.length === 0) return alert('Chưa có dữ liệu để xuất!');
       let csv = '\uFEFFHạng mục,Nền tảng,Link,Like,Comment,Share,View,Total Engagement,KPI Views,% KPI Views\n';
       trackerItems.forEach(i => {
         const eng = i.likes + i.comments + i.shares;
         const pct = i.kpiViews > 0 ? ((i.views / i.kpiViews) * 100).toFixed(1) + '%' : '0%';
-        csv += `"${i.author.replace(/"/g, '""')}","${i.platform}","${i.url}",${i.likes},${i.comments},${i.shares},${i.views},${eng},${i.kpiViews},"${pct}"\n`;
+        csv += `"${(i.author || '').replace(/"/g, '""')}","${i.platform}","${i.url}",${i.likes},${i.comments},${i.shares},${i.views},${eng},${i.kpiViews},"${pct}"\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
